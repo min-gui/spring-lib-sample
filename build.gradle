@@ -1,0 +1,79 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.sample'
+version = '0.0.1.sample'
+description = 'spring-sample-system'
+
+//프로젝트 공통 적용
+allprojects {
+	group = 'com.sample'
+	version = '0.0.1.sample'
+
+	repositories {
+		mavenCentral()
+	}
+}
+//서브 프로젝트에만 적용될 설정.
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'java-library'
+	apply plugin: 'io.spring.dependency-management'
+
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(21)
+		}
+	}
+
+	tasks.withType(JavaCompile) {
+		options.encoding = 'UTF-8'
+	}
+
+	tasks.withType(Test) {
+		systemProperty 'file.encoding', 'UTF-8'
+	}
+
+	configurations {
+		compileOnly {
+			extendsFrom annotationProcessor
+		}
+	}
+
+	// Spring Boot 의존성 관리
+	dependencyManagement {
+		imports {
+			mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+		}
+	}
+
+	// 공통 의존성
+	dependencies {
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+
+
+		implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+		implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testImplementation 'io.projectreactor:reactor-test'
+		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	}
+
+	tasks.named('test') {
+		useJUnitPlatform()
+	}
+}
+// 버전 정보 출력 태스크
+tasks.register('printVersion') {
+	doLast {
+		println "Project: ${project.name}"
+		println "Version: ${project.version}"
+		println "Group: ${project.group}"
+	}
+}
+

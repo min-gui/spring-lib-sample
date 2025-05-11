@@ -1,0 +1,32 @@
+plugins {
+    id 'org.springframework.boot'
+}
+
+dependencies {
+
+    // Spring Boot Webflux
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    //setting r2dbc mysql
+    implementation 'io.asyncer:r2dbc-mysql'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+}
+
+bootJar {
+    enabled = true
+    archiveBaseName = 'sample-api'
+    archiveVersion = "${version}"
+}
+
+jar {
+    enabled = false
+}
