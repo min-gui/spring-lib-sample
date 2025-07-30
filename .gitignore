@@ -1,5 +1,8 @@
 HELP.md
 application-mslocal.yml
+application-stage.yml
+application-dev.yml
+application-prod.yml
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
