@@ -59,6 +59,7 @@ Spring WebFlux와 R2DBC를 사용한 리액티브 웹 애플리케이션 템플�
 
 
 ### 배포 흐름도
+#### gitGraph
 ```mermaid
 gitGraph
   commit id: "기능 개발 시작"
@@ -98,6 +99,7 @@ gitGraph
   commit id: "feature/user 배포"
 
 ```
+#### flowchart
 ```mermaid
 flowchart TD
     A[개발자] --> B["main 기준 feature/* 브랜치 생성"]
