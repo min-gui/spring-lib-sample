@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   mariadb11:
     image: mariadb:11.8.3
@@ -9,3 +11,131 @@ services:
       MYSQL_USER: test
       MYSQL_PASSWORD: test
       MYSQL_DATABASE: test
+    volumes:
+      - ./sql-sample:/docker-entrypoint-initdb.d
+
+  # Redis 캐시 서비스
+  redis:
+    # Alpine Linux 기반 Redis 이미지 (매우 경량)
+    image: redis:7.2-alpine
+    # 컨테이너 이름 지정 (다른 서비스에서 참조 가능)
+    container_name: redis
+    # Docker 데몬 재시작 시 컨테이너 자동 실행 (수동으로 멈춘 경우 제외)
+    restart: unless-stopped
+    # 포트 매핑: 호스트 6379 <-> 컨테이너 6379
+    ports:
+      - "6379:6379"
+    # Redis 서버 실행 옵션 설정
+    command: >
+      redis-server
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+
+    # 최대 메모리 사용량을 2GB로 제한 maxmemory 2gb
+    # 메모리 초과 시 정책: 모든 키 중 가장 오래 사용하지 않은 키 삭제 maxmemory-policy allkeys-lru
+    # AOF(Append Only File) 영속성 활성화: 모든 쓰기 작업을 파일에 기록 appendonly yes
+    # AOF 파일을 디스크에 동기화하는 주기: 매초마다 (성능과 안정성 균형) appendfsync everysec
+    # RDB 스냅샷 저장 조건 1: 15분(900초) 동안 1개 이상 변경 시 저장 save 900 1
+    # RDB 스냅샷 저장 조건 2: 5분(300초) 동안 10개 이상 변경 시 저장 save 300 10
+    # RDB 스냅샷 저장 조건 3: 1분(60초) 동안 10,000개 이상 변경 시 저장 save 60 10000
+    # 데이터 영속성을 위한 볼륨 마운트 (컨테이너 /data 디렉토리를 호스트에 저장)
+    volumes:
+      - redis_data:/data
+    # 컨테이너 상태 체크 설정
+    healthcheck:
+      # Redis의 PING 명령으로 응답 확인 (응답이 PONG이면 정상)
+      test: ["CMD", "redis-cli", "ping"]
+      # 10초마다 상태 체크 수행
+      interval: 10s
+      # 3초 이내에 응답이 없으면 실패로 간주
+      timeout: 3s
+      # 3번 연속 실패 시 unhealthy 상태로 변경
+      retries: 3
+
+  # Redis 웹 기반 GUI 관리 도구 (선택 사항)
+  redis-commander:
+    # Redis Commander 최신 이미지
+    image: rediscommander/redis-commander:latest
+    # 컨테이너 이름
+    container_name: redis-commander
+    # 자동 재시작 설정
+    restart: unless-stopped
+    # 웹 UI 접속 포트: 브라우저에서 http://localhost:8081로 접속
+    ports:
+      - "8081:8081"
+    # 환경 변수 설정
+    environment:
+      # 연결할 Redis 서버 정보 (이름:호스트:포트)
+      REDIS_HOSTS: local:redis:6379
+    # 의존성 설정: redis 서비스가 먼저 시작된 후 redis-commander 시작
+    depends_on:
+      - redis
+
+  weaviate:
+    # Weaviate 최신 이미지
+    image: semitechnologies/weaviate:latest
+    # 컨테이너 이름
+    container_name: weaviate
+    # 자동 재시작 설정
+    restart: unless-stopped
+    # GraphQL API 접속 포트: http://localhost:8000
+    ports:
+      - "8080:8080"
+    # 환경 변수 설정
+    environment:
+      # 쿼리 결과 기본 제한 (최대 25개 결과)
+      QUERY_DEFAULTS_LIMIT: 25
+      # API 키 인증 비활성화 (개발 환경용, 프로덕션에선 활성화 권장)
+      AUTHENTICATION_APIKEY_ENABLED: 'false'
+      # 익명 접근 허용 (개발/테스트 환경용)
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      # 벡터 저장소 백엔드 설정 (기본값: 메모리 저장, 영속성 없음)
+      PERSISTENCE_DATA_PATH: /var/lib/weaviate
+      # 모듈 활성화: text2vec (텍스트 임베딩), qna (질문-답변)
+      ENABLE_MODULES: 'text2vec-contextionary'
+      # 기본 벡터화 모듈 설정
+      DEFAULT_VECTORIZER_MODULE: 'text2vec-contextionary'
+      #ENABLE_MODULES: 'text2vec-openai,generative-openai'
+      #DEFAULT_VECTORIZER_MODULE: 'text2vec-openai'
+      #OPENAI_APIKEY: 'your-api-key'  # OpenAI 사용 시
+    # 데이터 영속성을 위한 볼륨 마운트 (벡터 데이터베이스 저장)
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    # 컨테이너 상태 체크 설정
+    healthcheck:
+      # 헬스 체크 엔드포인트 (200 상태코드 응답 확인)
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/.well-known/ready"]
+      # 10초마다 상태 체크
+      interval: 10s
+      # 5초 이내에 응답 필요
+      timeout: 5s
+      # 3번 연속 실패 시 unhealthy
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          # 최대 사용 가능 메모리
+          memory: 4G
+          # 최대 사용 가능 CPU 코어 (1 = 1코어, 2 = 2코어)
+          cpus: '2'
+        reservations:
+          # 최소 예약 메모리 (컨테이너 시작 시 확보)
+          memory: 2G
+          # 최소 예약 CPU 코어
+          cpus: '1'
+
+# 볼륨 정의: 컨테이너 삭제 후에도 데이터 보존
+volumes:
+  # Redis 데이터 저장용 볼륨
+  redis_data:
+    # 로컬 드라이버: 호스트 파일시스템에 저장
+    driver: local
+  # Weaviate 벡터 데이터베이스 저장용 볼륨
+  weaviate_data:
+    # 로컬 드라이버: 호스트 파일시스템에 저장
+    driver: local
