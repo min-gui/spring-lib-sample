@@ -1,7 +1,10 @@
 spring:
+  config:
+    activate:
+      on-profile: local
   r2dbc:
     url: r2dbc:mysql://localhost:3306/test
-    username:
-    password:
+    username: test
+    password: test
     max-size: 10
     initial-size: 10
