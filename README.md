@@ -15,16 +15,16 @@ Spring WebFlux와 R2DBC를 사용한 리액티브 웹 애플리케이션 템플�
 - Spring Boot 3.4.5 기반
 
 ## 기술 스택
-- Java 21 이상
-- Gradle 8.5 이상
-- MySQL 8.0.36 이상
+- Java 21
+- Gradle 8.5
+- MariaDB 11.8.3
 
 ### Backend
 - **Java 21**
 - **Spring Boot 3.4.5**
 - **Spring WebFlux** - 리액티브 웹 프레임워크
 - **Spring Data R2DBC** - 리액티브 데이터베이스 연동
-- **MySQL 8.0.36** - 데이터베이스
+- **MariaDB 11.8.3** - 데이터베이스
 
 ### Build Tool
 - **Gradle** - 빌드 및 의존성 관리
