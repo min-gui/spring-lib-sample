@@ -12,7 +12,6 @@ feat: YYYYMMDD -
 # perf: 성능 개선
 # ci: CI 설정 파일 수정
 # build: 빌드 시스템 수정
-
 # 작성 예시:
 # feat: 20250129 - 사용자 인증 API 구현
 # fix: 20250129 - 결제 모듈 NPE 예외 처리
