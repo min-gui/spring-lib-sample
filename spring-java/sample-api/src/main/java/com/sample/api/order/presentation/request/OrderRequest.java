@@ -1,6 +1,5 @@
 package com.sample.api.order.presentation.request;
 
-import com.sample.api.order.domain.OrderEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

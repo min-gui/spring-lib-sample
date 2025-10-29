@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'samplelibrary module'
+
+// 필요시 이 모듈 전용 의존성 추가 예시
+// dependencies {
+//     api 'org.apache.commons:commons-lang3:3.14.0'  // 외부에 공개할 API 의존성
+//     implementation 'com.fasterxml.jackson.core:jackson-databind' // 내부 구현 의존성
+//     testImplementation 'org.assertj:assertj-core'
+// }
+
+jar {
+    enabled = true
+}

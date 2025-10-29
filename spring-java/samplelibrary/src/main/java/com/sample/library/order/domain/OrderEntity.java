@@ -1,8 +1,5 @@
-package com.sample.api.order.domain;
+package com.sample.library.order.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;

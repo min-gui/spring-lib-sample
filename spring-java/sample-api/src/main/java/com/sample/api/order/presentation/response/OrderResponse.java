@@ -1,12 +1,8 @@
 package com.sample.api.order.presentation.response;
 
-import com.sample.api.order.domain.OrderEntity;
-import com.sample.api.order.presentation.request.OrderRequest;
+import com.sample.library.order.domain.OrderEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.relational.core.mapping.Column;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

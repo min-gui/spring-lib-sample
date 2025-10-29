@@ -1,3 +1,4 @@
 rootProject.name = 'spring-java'
 
 include 'sample-api'
+include 'samplelibrary'
