@@ -97,10 +97,10 @@ services:
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       # 벡터 저장소 백엔드 설정 (기본값: 메모리 저장, 영속성 없음)
       PERSISTENCE_DATA_PATH: /var/lib/weaviate
-      DEFAULT_VECTORIZER_MODULE: 'none'
-
       # 모듈 활성화: text2vec (텍스트 임베딩), qna (질문-답변)
+      ENABLE_MODULES: ''
       # 기본 벡터화 모듈 설정
+      DEFAULT_VECTORIZER_MODULE: 'none'
       #DEFAULT_VECTORIZER_MODULE: 'text2vec-contextionary'
       #ENABLE_MODULES: 'text2vec-openai,generative-openai'
       #DEFAULT_VECTORIZER_MODULE: 'text2vec-openai'
